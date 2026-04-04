@@ -55,4 +55,15 @@ const login = async (req, res) => {
     }
 }
 
-module.exports = { register, login }
+const getMe = async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT id, email, photo FROM users WHERE id = $1' [req.user.id]
+        )
+        res.json(result.rows[0])
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+module.exports = { register, login, getMe }
