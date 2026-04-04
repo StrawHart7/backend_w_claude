@@ -61,7 +61,9 @@ const getMe = async (req, res) => {
             'SELECT id, email, photo FROM users WHERE id = $1' [req.user.id]
         )
         res.json(result.rows[0])
+        console.log('result:', result.rows)
     } catch (error) {
+        console.log('erreur getMe:', error.message)
         res.status(500).json({ message: error.message })
     }
 }
