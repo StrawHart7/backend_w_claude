@@ -4,9 +4,14 @@ const todoSchema = require('../validator/todosValidator')
 const getTodos = async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT * FROM todos WHERE user_id = $1 ORDER BY deadline ASC NULLS LAST, id ASC',
-      [req.user.id]
-    )
+  `SELECT * FROM todos 
+   WHERE user_id = $1 
+   ORDER BY 
+     completed ASC,
+     deadline ASC NULLS LAST,
+     id ASC`,
+  [req.user.id]
+)
     res.json(result.rows)
   } catch (error) {
     res.status(500).json({ message: error.message })
