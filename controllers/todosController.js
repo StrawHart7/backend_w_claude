@@ -1,5 +1,5 @@
 const pool = require('../db')
-const todoSchema = require('../validators/todosValidator')
+const todoSchema = require('../validator/todosValidator')
 
 const getTodos = async (req, res) => {
   try {
