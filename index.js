@@ -3,14 +3,12 @@ const express = require('express')
 const cors = require('cors')
 const todosRoutes = require('./routes/todosRoutes')
 const authRoutes = require('./routes/authRoutes')
-const uploadRoutes = require('./routes/uploadRoutes')
 const app = express()
 
 app.use(cors())
 app.use(express.json())
 app.use('/todos', todosRoutes)
 app.use('/auth', authRoutes)
-app.use('/uploads', express.static('uploads'))
 
 //Route de confirmation
 app.get('/health', (req, res) => {
