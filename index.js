@@ -10,7 +10,6 @@ app.use(cors())
 app.use(express.json())
 app.use('/todos', todosRoutes)
 app.use('/auth', authRoutes)
-app.use('/upload', uploadRoutes)
 app.use('/uploads', express.static('uploads'))
 
 //Route de confirmation
