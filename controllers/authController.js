@@ -55,14 +55,4 @@ const login = async (req, res) => {
     }
 }
 
-const deleteAccount = async (req, res) => {
-  try {
-    await pool.query('DELETE FROM todos WHERE user_id = $1', [req.user.id])
-    await pool.query('DELETE FROM users WHERE id = $1', [req.user.id])
-    res.json({ message: 'Compte supprimé' })
-  } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-}
-
-module.exports = { register, login, deleteAccount }
+module.exports = { register, login }
