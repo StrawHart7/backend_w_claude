@@ -97,4 +97,55 @@ const logout = async (req, res) => {
   }
 }
 
-module.exports = { register, login, refresh, logout }
+const updateEmail = async (req, res) => {
+  try {
+    const { newEmail, password } = req.body
+    const userId = req.user.id
+
+    // Vérifier que le nouvel email n'est pas déjà pris
+    const emailExists = await pool.query('SELECT * FROM users WHERE email = $1', [newEmail])
+    if (emailExists.rows.length > 0) {
+      return res.status(400).json({ message: 'Email déjà utilisé' })
+    }
+
+    // Vérifier le mot de passe actuel
+    const result = await pool.query('SELECT * FROM users WHERE id = $1', [userId])
+    const user = result.rows[0]
+    const validPassword = await bcrypt.compare(password, user.password)
+    if (!validPassword) {
+      return res.status(400).json({ message: 'Mot de passe incorrect' })
+    }
+
+    await pool.query('UPDATE users SET email = $1 WHERE id = $2', [newEmail, userId])
+
+    // Mettre à jour le localStorage côté client nécessite un nouveau token
+    const newAccessToken = generateAccessToken({ id: user.id, email: newEmail })
+    res.json({ message: 'Email mis à jour', accessToken: newAccessToken, email: newEmail })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+const updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+    const userId = req.user.id
+
+    // Vérifier l'ancien mot de passe
+    const result = await pool.query('SELECT * FROM users WHERE id = $1', [userId])
+    const user = result.rows[0]
+    const validPassword = await bcrypt.compare(currentPassword, user.password)
+    if (!validPassword) {
+      return res.status(400).json({ message: 'Mot de passe actuel incorrect' })
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
+    await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, userId])
+
+    res.json({ message: 'Mot de passe mis à jour' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+module.exports = { register, login, refresh, logout, updateEmail, updatePassword }
