@@ -15,6 +15,10 @@ app.get('/health', (req, res) => {
     res.status(200).json({statut: 'Ok', message: "Backend is running"})
 })
 
+app.get('/ping', (req, res) => {
+  res.json({ status: 'ok' })
+})
+
 // Cast the backend on PORT 3000
 app.listen(process.env.PORT, () => {
     console.log(`Server running on http://localhost:${process.env.PORT}`)
