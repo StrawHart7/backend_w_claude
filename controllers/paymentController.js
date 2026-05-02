@@ -22,8 +22,6 @@ const initiatePayment = async (req, res) => {
       }
     )
 
-    console.log('Notchpay response:', JSON.stringify(response.data, null, 2))
-
     const { authorization_url } = response.data
     const { reference } = response.data.transaction
 
