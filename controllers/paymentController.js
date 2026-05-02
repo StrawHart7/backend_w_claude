@@ -3,7 +3,7 @@ const pool = require('../db')
 
 const initiatePayment = async (req, res) => {
   try {
-    const user = req.user // injecté par authMiddleware
+    const user = req.user
 
     const response = await axios.post(
       'https://api.notchpay.co/payments/initialize',
@@ -16,7 +16,7 @@ const initiatePayment = async (req, res) => {
       },
       {
         headers: {
-          Authorization: process.env.NOTCHPAY_PUBLIC_KEY,
+          Authorization: `Bearer ${process.env.NOTCHPAY_PUBLIC_KEY}`,
           'Content-Type': 'application/json'
         }
       }
