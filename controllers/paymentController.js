@@ -48,8 +48,10 @@ const verifyPayment = async (req, res) => {
     )
 
     const transaction = response.data.transaction
+    const isSandbox = transaction.sandbox === 1 || transaction.sandbox === true
+    const isValid = transaction.status === 'complete' || isSandbox
 
-    if (transaction.status === 'complete') {
+    if (isValid) {
       await pool.query(
         'UPDATE users SET is_premium = TRUE WHERE id = $1',
         [userId]
