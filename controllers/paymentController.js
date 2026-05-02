@@ -46,6 +46,8 @@ const verifyPayment = async (req, res) => {
       }
     )
 
+    console.log('Verify response:', JSON.stringify(response.data, null, 2))
+
     const transaction = response.data.transaction
 
     if (transaction.status === 'complete') {
