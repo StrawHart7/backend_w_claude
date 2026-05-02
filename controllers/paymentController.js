@@ -23,6 +23,8 @@ const initiatePayment = async (req, res) => {
       }
     )
 
+    console.log('Initiate response:', JSON.stringify(response.data, null, 2))
+
     const { authorization_url, reference } = response.data.data
 
     res.json({ authorization_url, reference })
