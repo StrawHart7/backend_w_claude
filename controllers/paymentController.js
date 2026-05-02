@@ -41,7 +41,8 @@ const verifyPayment = async (req, res) => {
       `https://api.notchpay.co/payments/${reference}`,
       {
         headers: {
-          Authorization: process.env.NOTCHPAY_SECRET_KEY
+          Authorization: `Bearer ${process.env.NOTCHPAY_SECRET_KEY}`,
+          'Content-Type': 'application/json'
         }
       }
     )
