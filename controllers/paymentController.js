@@ -2,7 +2,6 @@ const axios = require('axios')
 const pool = require('../db')
 
 const initiatePayment = async (req, res) => {
-  console.log('Public key starts with:', process.env.NOTCHPAY_PUBLIC_KEY?.substring(0, 10))
   try {
     const user = req.user
 
@@ -23,9 +22,8 @@ const initiatePayment = async (req, res) => {
       }
     )
 
-    console.log('Initiate response:', JSON.stringify(response.data, null, 2))
-
-    const { authorization_url, reference } = response.data.data
+    const { authorization_url } = response.data
+    const { reference } = response.data.transaction
 
     res.json({ authorization_url, reference })
   } catch (err) {
@@ -49,9 +47,7 @@ const verifyPayment = async (req, res) => {
       }
     )
 
-    console.log('Verify response:', JSON.stringify(response.data, null, 2))
-
-    const transaction = response.data.data
+    const transaction = response.data.transaction
 
     if (transaction.status === 'complete') {
       await pool.query(
@@ -63,10 +59,9 @@ const verifyPayment = async (req, res) => {
       res.status(400).json({ message: 'Paiement non complété' })
     }
   } catch (err) {
-  console.error('Notchpay initiate error full:', JSON.stringify(err.response?.data, null, 2))
-  console.error('Notchpay initiate status:', err.response?.status)
-  res.status(500).json({ message: 'Erreur initialisation paiement' })
-}
+    console.error('Notchpay verify error:', err.response?.data || err.message)
+    res.status(500).json({ message: 'Erreur vérification paiement' })
+  }
 }
 
 module.exports = { initiatePayment, verifyPayment }
