@@ -6,7 +6,7 @@ const initiatePayment = async (req, res) => {
     const user = req.user
 
     const response = await axios.post(
-      'https://api.notchpay.co/payments/initialize',
+      'https://api.notchpay.co/payments',
       {
         email: user.email,
         amount: 10,
@@ -16,14 +16,13 @@ const initiatePayment = async (req, res) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.NOTCHPAY_PUBLIC_KEY}`,
+          Authorization: process.env.NOTCHPAY_PUBLIC_KEY,
           'Content-Type': 'application/json'
         }
       }
     )
 
-    const { authorization_url } = response.data
-    const { reference } = response.data.transaction
+    const { authorization_url, reference } = response.data.data
 
     res.json({ authorization_url, reference })
   } catch (err) {
@@ -41,7 +40,7 @@ const verifyPayment = async (req, res) => {
       `https://api.notchpay.co/payments/${reference}`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.NOTCHPAY_SECRET_KEY}`,
+          Authorization: process.env.NOTCHPAY_SECRET_KEY,
           'Content-Type': 'application/json'
         }
       }
@@ -49,7 +48,7 @@ const verifyPayment = async (req, res) => {
 
     console.log('Verify response:', JSON.stringify(response.data, null, 2))
 
-    const transaction = response.data.transaction
+    const transaction = response.data.data
 
     if (transaction.status === 'complete') {
       await pool.query(
