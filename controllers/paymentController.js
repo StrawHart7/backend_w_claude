@@ -63,9 +63,10 @@ const verifyPayment = async (req, res) => {
       res.status(400).json({ message: 'Paiement non complété' })
     }
   } catch (err) {
-    console.error('Notchpay verify error:', err.response?.data || err.message)
-    res.status(500).json({ message: 'Erreur vérification paiement' })
-  }
+  console.error('Notchpay initiate error full:', JSON.stringify(err.response?.data, null, 2))
+  console.error('Notchpay initiate status:', err.response?.status)
+  res.status(500).json({ message: 'Erreur initialisation paiement' })
+}
 }
 
 module.exports = { initiatePayment, verifyPayment }
