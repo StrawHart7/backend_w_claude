@@ -2,6 +2,7 @@ const axios = require('axios')
 const pool = require('../db')
 
 const initiatePayment = async (req, res) => {
+  console.log('Public key starts with:', process.env.NOTCHPAY_PUBLIC_KEY?.substring(0, 10))
   try {
     const user = req.user
 
