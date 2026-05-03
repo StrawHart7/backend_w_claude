@@ -68,7 +68,6 @@ const refresh = async (req, res) => {
     const { refreshToken } = req.body
     if (!refreshToken) return res.status(401).json({ message: 'Refresh token manquant' })
 
-    // Vérifier que le token existe en BDD
     const result = await pool.query(
       'SELECT * FROM refresh_tokens WHERE token = $1',
       [refreshToken]
@@ -77,9 +76,7 @@ const refresh = async (req, res) => {
       return res.status(401).json({ message: 'Refresh token invalide' })
     }
 
-    // Vérifier la signature
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET)
-
     const newAccessToken = generateAccessToken({ id: decoded.id, email: decoded.email })
     res.json({ accessToken: newAccessToken })
   } catch (error) {
@@ -102,13 +99,11 @@ const updateEmail = async (req, res) => {
     const { newEmail, password } = req.body
     const userId = req.user.id
 
-    // Vérifier que le nouvel email n'est pas déjà pris
     const emailExists = await pool.query('SELECT * FROM users WHERE email = $1', [newEmail])
     if (emailExists.rows.length > 0) {
       return res.status(400).json({ message: 'Email déjà utilisé' })
     }
 
-    // Vérifier le mot de passe actuel
     const result = await pool.query('SELECT * FROM users WHERE id = $1', [userId])
     const user = result.rows[0]
     const validPassword = await bcrypt.compare(password, user.password)
@@ -118,7 +113,6 @@ const updateEmail = async (req, res) => {
 
     await pool.query('UPDATE users SET email = $1 WHERE id = $2', [newEmail, userId])
 
-    // Mettre à jour le localStorage côté client nécessite un nouveau token
     const newAccessToken = generateAccessToken({ id: user.id, email: newEmail })
     res.json({ message: 'Email mis à jour', accessToken: newAccessToken, email: newEmail })
   } catch (error) {
@@ -131,7 +125,6 @@ const updatePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body
     const userId = req.user.id
 
-    // Vérifier l'ancien mot de passe
     const result = await pool.query('SELECT * FROM users WHERE id = $1', [userId])
     const user = result.rows[0]
     const validPassword = await bcrypt.compare(currentPassword, user.password)
@@ -148,4 +141,16 @@ const updatePassword = async (req, res) => {
   }
 }
 
-module.exports = { register, login, refresh, logout, updateEmail, updatePassword }
+const getMe = async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, email, photo, is_premium FROM users WHERE id = $1',
+      [req.user.id]
+    )
+    res.json(result.rows[0])
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+module.exports = { register, login, refresh, logout, updateEmail, updatePassword, getMe }
