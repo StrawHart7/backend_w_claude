@@ -4,6 +4,8 @@ const cors = require('cors')
 const todosRoutes = require('./routes/todosRoutes')
 const authRoutes = require('./routes/authRoutes')
 const paymentRoutes = require('./routes/paymentRoutes')
+const pushRoutes = require('./routes/pushRoutes');
+const { sendDeadlineReminders } = require('./controllers/pushController');
 const app = express()
 
 app.use(cors())
@@ -11,6 +13,9 @@ app.use(express.json())
 app.use('/todos', todosRoutes)
 app.use('/auth', authRoutes)
 app.use('/payment', paymentRoutes)
+app.use('/push', pushRoutes);
+
+setInterval(sendDeadlineReminders, 60 * 1000);
 
 //Route de confirmation
 app.get('/health', (req, res) => {
