@@ -77,36 +77,4 @@ const sendDeadlineReminders = async () => {
   }
 };
 
-const testPush = async (req, res) => {
-  const userId = req.user.id;
-  try {
-    const { rows: subs } = await db.query(
-      'SELECT * FROM push_subscriptions WHERE user_id = $1',
-      [userId]
-    );
-
-    if (subs.length === 0) {
-      return res.status(404).json({ error: 'Aucune subscription trouvée' });
-    }
-
-    for (const sub of subs) {
-      const pushSub = {
-        endpoint: sub.endpoint,
-        keys: { p256dh: sub.p256dh, auth: sub.auth }
-      };
-
-      await webpush.sendNotification(pushSub, JSON.stringify({
-        title: '✅ Test notification',
-        body: 'Les push notifications fonctionnent !',
-        url: '/todos'
-      }));
-    }
-
-    res.json({ message: 'Notification envoyée !' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erreur serveur' });
-  }
-};
-
-module.exports = { subscribe, sendDeadlineReminders, testPush };
+module.exports = { subscribe, sendDeadlineReminders };
