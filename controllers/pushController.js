@@ -40,8 +40,8 @@ const sendDeadlineReminders = async () => {
       SELECT t.id, t.tache, t.deadline, t.user_id
       FROM todos t
       WHERE t.completed = FALSE
-        AND t.deadline IS NOT NULL
-        AND t.deadline = CURRENT_DATE + INTERVAL '1 day'
+        AND t.deadline >= NOW()
+        AND t.deadline <= NOW() + INTERVAL '1 hour'
     `);
 
     for (const todo of todos) {
